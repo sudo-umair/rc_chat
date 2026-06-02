@@ -19,6 +19,7 @@ const DEFAULT_SETTINGS = {
     offsetY: 0,
     fontSize: 100,
     fontWeight: 300,
+    visibility: 'fade',    // 'fade' | 'always' | 'hidden'
 };
 
 let settings = { ...DEFAULT_SETTINGS };
@@ -115,6 +116,7 @@ function applySettings() {
     root.setProperty('--chat-font-weight', settings.fontWeight);
 
     // sync panel controls
+    document.getElementById('setting-visibility').value = settings.visibility;
     document.getElementById('setting-offset-x').value = settings.offsetX;
     document.getElementById('setting-offset-y').value = settings.offsetY;
     document.getElementById('setting-font-size').value = settings.fontSize;
@@ -144,6 +146,12 @@ function bindSettingsControls() {
         applySettings();
     });
 
+    document.getElementById('setting-visibility').addEventListener('change', (e) => {
+        settings.visibility = e.target.value;
+        applySettings();
+        wakeFeed();
+    });
+
     document.getElementById('settings-save').addEventListener('click', () => {
         post('saveSettings', { settings });
         closeSettings();
@@ -171,9 +179,18 @@ function closeSettings() {
 /* ------------------------------------------------------------------ */
 
 function wakeFeed() {
-    elChatWindow.classList.remove('faded');
     if (fadeTimer) clearTimeout(fadeTimer);
-    if (!inputOpen) {
+
+    // hidden: only show the feed while the input is open
+    if (settings.visibility === 'hidden' && !inputOpen) {
+        elChatWindow.classList.add('faded');
+        return;
+    }
+
+    elChatWindow.classList.remove('faded');
+
+    // fade: hide again after the timeout; always: stay visible
+    if (!inputOpen && settings.visibility === 'fade') {
         fadeTimer = setTimeout(() => {
             elChatWindow.classList.add('faded');
         }, CONFIG.fadeTimeout);

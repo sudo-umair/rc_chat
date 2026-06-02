@@ -37,10 +37,11 @@ end
 -----------------------------------------------------------------------------
 
 local DEFAULT_SETTINGS = {
-    offsetX    = 0,     -- % offset from the default position
+    offsetX    = 0,       -- % offset from the default position
     offsetY    = 0,
-    fontSize   = 100,   -- % scale
+    fontSize   = 100,     -- % scale
     fontWeight = 300,
+    visibility = 'fade',  -- 'fade' (auto-hide) | 'always' (permanent) | 'hidden'
 }
 
 local function loadSettings()

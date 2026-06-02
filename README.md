@@ -24,8 +24,10 @@ Built from scratch (no escrow, no encrypted files) to replace `jc_chat`.
 - **Autocomplete suggestions** — command list with help text while typing, Tab to complete,
   arrow keys to navigate, sent-message history with ↑/↓
 - **Typing indicator** — players within 8m see "<name> is typing…"
-- **Settings panel** — chat position, font size and weight; persisted per player (KVP)
-- **Idle fade** — the feed fades out ~10s after the last message; `T` brings it back
+- **Settings panel** — chat position, font size and weight, feed visibility; persisted per
+  player (KVP)
+- **Feed visibility** — show (auto-fade ~10s after the last message), show permanently
+  (never fades), or hide (only visible while typing); `T` always brings the input back
 - **ESX + QBCore** — framework auto-detected; ace-permission fallback for standalone
 
 ## Installation
