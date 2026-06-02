@@ -191,6 +191,30 @@ html, body {
     white-space: pre-wrap;
 }
 
+/* location chip on emergency calls (/911) */
+.msg-location {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    vertical-align: baseline;
+    margin-left: 6px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 0.8em;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.msg-location svg {
+    width: 0.9em;
+    height: 0.9em;
+    color: var(--badge);
+    flex-shrink: 0;
+}
+
 /* legacy template messages (chat:addMessage with template) */
 .msg-template {
     width: fit-content;

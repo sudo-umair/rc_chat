@@ -39,6 +39,9 @@ Strings = {
     unmute_received      = 'You have been unmuted — you can use the chat again.',
     not_muted            = '%s (id %d) is not muted.',
 
+    -- Emergency call location
+    location_unknown = 'Unknown location',
+
     -- Typing indicator
     is_typing = 'is typing...',
 

@@ -237,13 +237,38 @@ local function getDeliveryTargets(src, def)
     return nil   -- nil = TriggerClientEvent to -1
 end
 
-local function deliver(targets, payload)
+-- Copy of the payload without the blip flag — sent to the sender, who
+-- doesn't need a map marker to their own position
+local function stripBlip(payload)
+    if not (payload.location and payload.location.blip) then
+        return payload
+    end
+    local copy = {}
+    for k, v in pairs(payload) do copy[k] = v end
+    local location = {}
+    for k, v in pairs(payload.location) do location[k] = v end
+    location.blip = nil
+    copy.location = location
+    return copy
+end
+
+local function deliver(targets, payload, senderId)
+    local senderPayload = stripBlip(payload)
+
     if targets == nil then
-        TriggerClientEvent('rc_chat:message', -1, payload)
-    else
-        for _, id in ipairs(targets) do
-            TriggerClientEvent('rc_chat:message', id, payload)
+        if senderPayload == payload then
+            TriggerClientEvent('rc_chat:message', -1, payload)
+        else
+            for _, playerId in ipairs(GetPlayers()) do
+                local id = tonumber(playerId)
+                TriggerClientEvent('rc_chat:message', id, id == senderId and senderPayload or payload)
+            end
         end
+        return
+    end
+
+    for _, id in ipairs(targets) do
+        TriggerClientEvent('rc_chat:message', id, id == senderId and senderPayload or payload)
     end
 end
 
@@ -321,12 +346,25 @@ local function handleChatCommand(def, src, rawText)
         text  = text,
     }
 
+    -- attach the sender's position for location-aware commands (/911);
+    -- the street name and blip are resolved client-side from these coords
+    if def.attachLocation or def.attachBlip then
+        local coords = GetEntityCoords(GetPlayerPed(src))
+        payload.location = {
+            x          = coords.x,
+            y          = coords.y,
+            z          = coords.z,
+            showStreet = def.attachLocation or nil,
+            blip       = def.attachBlip or nil,
+        }
+    end
+
     -- let other resources react / cancel ('rc_chat:messageSent' hook)
     TriggerEvent('rc_chat:messageSent', src, def.name, text)
 
     -- deliver
     local targets = getDeliveryTargets(src, def)
-    deliver(targets, payload)
+    deliver(targets, payload, src)
 
     debugPrint(('/%s from %s (%d): %s'):format(def.name, GetPlayerName(src), src, text))
 end

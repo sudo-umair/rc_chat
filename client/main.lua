@@ -161,10 +161,58 @@ RegisterNUICallback('saveSettings', function(data, cb)
 end)
 
 -----------------------------------------------------------------------------
+-- Emergency call locations & blips (commands with attachLocation/attachBlip)
+-----------------------------------------------------------------------------
+
+-- "Strawberry Ave, Davis" from world coordinates
+local function resolveLocationText(location)
+    local streetHash = GetStreetNameAtCoord(location.x, location.y, location.z)
+    local street = GetStreetNameFromHashKey(streetHash)
+    local zone = GetLabelText(GetNameOfZone(location.x, location.y, location.z))
+
+    if zone == 'NULL' then zone = nil end
+    if street == '' then street = nil end
+
+    if street and zone and street ~= zone then
+        return ('%s, %s'):format(street, zone)
+    end
+    return street or zone or Strings.location_unknown
+end
+
+-- Temporary flashing blip at the caller's position
+local function createCallBlip(location, label)
+    local cfg = Config.CallBlip
+    local blip = AddBlipForCoord(location.x, location.y, location.z)
+    SetBlipSprite(blip, cfg.sprite)
+    SetBlipColour(blip, cfg.color)
+    SetBlipScale(blip, cfg.scale)
+    SetBlipAsShortRange(blip, false)
+    if cfg.flash then
+        SetBlipFlashes(blip, true)
+    end
+
+    BeginTextCommandSetBlipName('STRING')
+    AddTextComponentSubstringPlayerName(label or '911')
+    EndTextCommandSetBlipName(blip)
+
+    SetTimeout(cfg.duration * 1000, function()
+        RemoveBlip(blip)
+    end)
+end
+
+-----------------------------------------------------------------------------
 -- rc_chat events
 -----------------------------------------------------------------------------
 
 RegisterNetEvent('rc_chat:message', function(payload)
+    if payload.location then
+        if payload.location.showStreet then
+            payload.locationText = resolveLocationText(payload.location)
+        end
+        if payload.location.blip then
+            createCallBlip(payload.location, payload.badge)
+        end
+    end
     sendToFeed(payload)
 end)
 

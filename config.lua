@@ -82,6 +82,18 @@ Config.Mute = {
 }
 
 -----------------------------------------------------------------------------
+-- Emergency call blips — used by commands with attachBlip = true (/911)
+-----------------------------------------------------------------------------
+
+Config.CallBlip = {
+    sprite   = 1,      -- blip icon (https://docs.fivem.net/docs/game-references/blips/)
+    color    = 1,      -- 1 = red
+    scale    = 1.0,
+    flash    = true,   -- flash when the blip first appears
+    duration = 60,     -- seconds before the blip disappears from the map
+}
+
+-----------------------------------------------------------------------------
 -- Typing indicator — nearby players see "<name> is typing..."
 -----------------------------------------------------------------------------
 
@@ -117,6 +129,11 @@ Config.TypingIndicator = {
 -- Moderation:
 --   allowHTML      : allow raw HTML in the message (dangerous — admins only)
 --   blockProfanity : run the message through the profanity filter
+--
+-- Location (emergency calls):
+--   attachLocation : append the sender's street / area to the message
+--   attachBlip     : receivers get a temporary map blip at the sender's
+--                    position (see Config.CallBlip); the sender gets no blip
 -----------------------------------------------------------------------------
 
 Config.Commands = {
@@ -215,8 +232,22 @@ Config.Commands = {
         blockProfanity = false,
     },
     {
-        name           = 'callems',
-        help           = 'Request medical help — only on-duty EMS see the call',
+        name           = '911',
+        help           = 'Call the police — only on-duty officers see the call',
+        params         = 'message',
+        badge          = '911',
+        color          = '#F43F5E',
+        nameMode       = 'character',
+        showId         = true,
+        toJobs         = { 'police' },
+        cooldown       = 30,
+        blockProfanity = true,
+        attachLocation = true,
+        attachBlip     = true,
+    },
+    {
+        name           = '912',
+        help           = 'Call EMS — only on-duty medics see the call',
         params         = 'message',
         badge          = 'EMS CALL',
         color          = '#EF4444',
@@ -225,6 +256,8 @@ Config.Commands = {
         toJobs         = { 'ambulance' },
         cooldown       = 30,
         blockProfanity = true,
+        attachLocation = true,
+        attachBlip     = true,
     },
     {
         name           = 'adminchat',
