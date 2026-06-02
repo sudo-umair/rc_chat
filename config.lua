@@ -82,7 +82,7 @@ Config.Mute = {
 }
 
 -----------------------------------------------------------------------------
--- Emergency call blips — used by commands with attachBlip = true (/911)
+-- Emergency call blips — used by commands with attachBlip = true (/15)
 -----------------------------------------------------------------------------
 
 Config.CallBlip = {
@@ -232,10 +232,10 @@ Config.Commands = {
         blockProfanity = false,
     },
     {
-        name           = '911',
+        name           = '15',
         help           = 'Call the police — only on-duty officers see the call',
         params         = 'message',
-        badge          = '911',
+        badge          = '15',
         color          = '#3B82F6',
         nameMode       = 'character',
         showId         = true,
@@ -246,10 +246,10 @@ Config.Commands = {
         attachBlip     = true,
     },
     {
-        name           = '912',
+        name           = '1122',
         help           = 'Call EMS — only on-duty medics see the call',
         params         = 'message',
-        badge          = '912',
+        badge          = '1122',
         color          = '#EF4444',
         nameMode       = 'character',
         showId         = true,

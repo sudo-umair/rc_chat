@@ -191,7 +191,7 @@ html, body {
     white-space: pre-wrap;
 }
 
-/* location chip on emergency calls (/911) */
+/* location chip on emergency calls (/15) */
 .msg-location {
     display: inline-flex;
     align-items: center;

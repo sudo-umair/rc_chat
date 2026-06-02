@@ -17,7 +17,7 @@ Built from scratch (no escrow, no encrypted files) to replace `jc_chat`.
 - **Config-driven commands** — add a command purely in `config.lua`: badge, color,
   proximity radius, job whitelist, admin-only, per-command cooldown, delivery targeting
 - **Command-only chat** — plain (non-command) chat is disabled; players get a hint to use `/ooc`, `/twt`, …
-- **Emergency calls** — `/911` (police) and `/912` (EMS) reach only on-duty units, with the
+- **Emergency calls** — `/15` (police) and `/1122` (EMS) reach only on-duty units, with the
   caller's street attached and a temporary flashing blip on the responders' map
 - **Moderation** — profanity filter, anti-spam (cooldown + repeat detection), staff chat
   mute (`/mutechat`), Discord webhook logging, admin exemptions
@@ -57,8 +57,8 @@ Built from scratch (no escrow, no encrypted files) to replace `jc_chat`.
 | `/police` | POLICE | everyone | `police` job |
 | `/ems` | EMS | everyone | `ambulance` job |
 | `/mechanic` | MECHANIC | everyone | `mechanic` job |
-| `/911` | 911 | police only + street + map blip | 30 s cooldown |
-| `/912` | 912 | ambulance only + street + map blip | 30 s cooldown |
+| `/15` | 15 | police only + street + map blip | 30 s cooldown |
+| `/1122` | 1122 | ambulance only + street + map blip | 30 s cooldown |
 | `/adminchat` | STAFF | admins only | admin groups |
 | `/clear` | — | clear own chat | — |
 | `/clearall` | — | clear everyone's chat | admin groups |

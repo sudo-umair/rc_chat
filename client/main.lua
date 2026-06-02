@@ -193,7 +193,7 @@ local function createCallBlip(location, label)
     end
 
     BeginTextCommandSetBlipName('STRING')
-    AddTextComponentSubstringPlayerName(label or '911')
+    AddTextComponentSubstringPlayerName(label or '15')
     EndTextCommandSetBlipName(blip)
 
     SetTimeout(cfg.duration * 1000, function()

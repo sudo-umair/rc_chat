@@ -346,7 +346,7 @@ local function handleChatCommand(def, src, rawText)
         text  = text,
     }
 
-    -- attach the sender's position for location-aware commands (/911);
+    -- attach the sender's position for location-aware commands (/15);
     -- the street name and blip are resolved client-side from these coords
     if def.attachLocation or def.attachBlip then
         local coords = GetEntityCoords(GetPlayerPed(src))
