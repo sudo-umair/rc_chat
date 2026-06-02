@@ -71,6 +71,17 @@ Config.Profanity = {
 }
 
 -----------------------------------------------------------------------------
+-- Chat mute — staff can mute individual players from chat
+-----------------------------------------------------------------------------
+
+Config.Mute = {
+    muteCommand    = 'mutechat',     -- /mutechat <id> [minutes]
+    unmuteCommand  = 'unmutechat',   -- /unmutechat <id>
+    defaultMinutes = 10,             -- duration when no minutes argument is given (0 = until unmuted / restart)
+    webhook        = '',             -- Discord webhook URL for mute/unmute actions ('' = disabled)
+}
+
+-----------------------------------------------------------------------------
 -- Typing indicator — nearby players see "<name> is typing..."
 -----------------------------------------------------------------------------
 

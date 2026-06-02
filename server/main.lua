@@ -5,6 +5,7 @@
 local lastMessageAt   = {}   -- [src] = game timer of last message (anti-spam)
 local lastMessageText = {}   -- [src] = { text = string, count = number } (repeat detection)
 local commandLastUsed = {}   -- [src] = { [commandName] = os.time() } (per-command cooldowns)
+local mutedUntil      = {}   -- [license] = os.time() expiry (0 = until unmuted / restart)
 
 -----------------------------------------------------------------------------
 -- Helpers
@@ -46,6 +47,15 @@ local function systemMessage(src, text)
     })
 end
 
+-- Reply to a command issuer — chat message for players, console print for source 0
+local function respond(src, text)
+    if src == 0 then
+        print('[rc_chat] ' .. text)
+    else
+        systemMessage(src, text)
+    end
+end
+
 -- Discord webhook logging
 local function sendWebhook(url, text)
     if not url or url == '' then return end
@@ -80,6 +90,44 @@ local function resolveName(src, nameMode)
     else
         return GetPlayerName(src)
     end
+end
+
+-----------------------------------------------------------------------------
+-- Chat mute
+--
+-- Mutes are keyed by license identifier so reconnecting doesn't lift them.
+-----------------------------------------------------------------------------
+
+local function getLicense(src)
+    return GetPlayerIdentifierByType(src, 'license') or ('src:%d'):format(src)
+end
+
+-- Remaining mute time in minutes (0 = muted until unmuted/restart), or nil if not muted
+local function getMuteRemaining(src)
+    local license = getLicense(src)
+    local expiry = mutedUntil[license]
+    if not expiry then return nil end
+    if expiry == 0 then return 0 end
+
+    local remaining = expiry - os.time()
+    if remaining <= 0 then
+        mutedUntil[license] = nil
+        return nil
+    end
+    return math.ceil(remaining / 60)
+end
+
+-- If the player is muted, tell them and return true
+local function rejectIfMuted(src)
+    local remaining = getMuteRemaining(src)
+    if not remaining then return false end
+
+    if remaining > 0 then
+        systemMessage(src, _L('you_are_muted_timed', remaining))
+    else
+        systemMessage(src, _L('you_are_muted'))
+    end
+    return true
 end
 
 -----------------------------------------------------------------------------
@@ -206,6 +254,11 @@ end
 local function handleChatCommand(def, src, rawText)
     local isAdmin = Bridge.IsAdmin(src)
 
+    -- muted players can't send anything
+    if rejectIfMuted(src) then
+        return
+    end
+
     -- permission: admin only
     if def.adminOnly and not isAdmin then
         systemMessage(src, _L('perm_denied'))
@@ -310,6 +363,77 @@ CreateThread(function()
             text  = _L('chat_cleared_by'),
         })
     end, false)
+
+    -- /mutechat <id> [minutes] — mute a player from chat (admin / console)
+    RegisterCommand(Config.Mute.muteCommand, function(source, args)
+        if source ~= 0 and not Bridge.IsAdmin(source) then
+            systemMessage(source, _L('perm_denied'))
+            return
+        end
+
+        local targetId = math.tointeger(tonumber(args[1]))
+        if not targetId then
+            respond(source, _L('mute_usage', Config.Mute.muteCommand))
+            return
+        end
+        if not GetPlayerName(targetId) then
+            respond(source, _L('mute_invalid_target', targetId))
+            return
+        end
+        if Bridge.IsAdmin(targetId) then
+            respond(source, _L('mute_target_staff'))
+            return
+        end
+
+        -- whole minutes only; 0 = until unmuted / restart
+        local minutes    = math.max(0, math.floor(tonumber(args[2]) or Config.Mute.defaultMinutes))
+        local targetName = GetPlayerName(targetId)
+        local adminName  = source == 0 and 'Console' or GetPlayerName(source)
+
+        if minutes > 0 then
+            mutedUntil[getLicense(targetId)] = os.time() + math.floor(minutes * 60)
+            respond(source, _L('mute_applied', targetName, targetId, minutes))
+            systemMessage(targetId, _L('mute_received_timed', minutes))
+            sendWebhook(Config.Mute.webhook, _L('log_mute', adminName, targetName, targetId, minutes))
+        else
+            mutedUntil[getLicense(targetId)] = 0
+            respond(source, _L('mute_applied_perm', targetName, targetId))
+            systemMessage(targetId, _L('mute_received'))
+            sendWebhook(Config.Mute.webhook, _L('log_mute_perm', adminName, targetName, targetId))
+        end
+    end, false)
+
+    -- /unmutechat <id> — lift a chat mute (admin / console)
+    RegisterCommand(Config.Mute.unmuteCommand, function(source, args)
+        if source ~= 0 and not Bridge.IsAdmin(source) then
+            systemMessage(source, _L('perm_denied'))
+            return
+        end
+
+        local targetId = math.tointeger(tonumber(args[1]))
+        if not targetId then
+            respond(source, _L('unmute_usage', Config.Mute.unmuteCommand))
+            return
+        end
+        if not GetPlayerName(targetId) then
+            respond(source, _L('mute_invalid_target', targetId))
+            return
+        end
+
+        local license    = getLicense(targetId)
+        local targetName = GetPlayerName(targetId)
+        if not mutedUntil[license] then
+            respond(source, _L('not_muted', targetName, targetId))
+            return
+        end
+
+        mutedUntil[license] = nil
+        respond(source, _L('unmute_applied', targetName, targetId))
+        systemMessage(targetId, _L('unmute_received'))
+
+        local adminName = source == 0 and 'Console' or GetPlayerName(source)
+        sendWebhook(Config.Mute.webhook, _L('log_unmute', adminName, targetName, targetId))
+    end, false)
 end)
 
 -----------------------------------------------------------------------------
@@ -327,6 +451,16 @@ local function buildSuggestions()
     end
     suggestions[#suggestions + 1] = { name = '/' .. Config.ClearCommand, help = _L('clear_help') }
     suggestions[#suggestions + 1] = { name = '/' .. Config.ClearAllCommand, help = _L('clearall_help') }
+    suggestions[#suggestions + 1] = {
+        name   = '/' .. Config.Mute.muteCommand,
+        help   = _L('mutechat_help'),
+        params = { { name = 'id', help = '' }, { name = 'minutes', help = '' } },
+    }
+    suggestions[#suggestions + 1] = {
+        name   = '/' .. Config.Mute.unmuteCommand,
+        help   = _L('unmutechat_help'),
+        params = { { name = 'id', help = '' } },
+    }
     return suggestions
 end
 
@@ -342,6 +476,8 @@ RegisterNetEvent('rc_chat:ready', function()
     end
     ownCommands[Config.ClearCommand] = true
     ownCommands[Config.ClearAllCommand] = true
+    ownCommands[Config.Mute.muteCommand] = true
+    ownCommands[Config.Mute.unmuteCommand] = true
 
     local extra = {}
     for _, command in ipairs(GetRegisteredCommands()) do
@@ -403,6 +539,9 @@ RegisterNetEvent('_chat:messageEntered', function(author, color, message)
         systemMessage(src, _L('plain_disabled'))
         return
     end
+
+    -- muted players can't use plain chat either
+    if rejectIfMuted(src) then return end
 
     -- legacy chatMessage hook — other resources can CancelEvent() to block
     TriggerEvent('chatMessage', src, author, message)

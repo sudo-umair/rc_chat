@@ -17,8 +17,8 @@ Built from scratch (no escrow, no encrypted files) to replace `jc_chat`.
 - **Config-driven commands** — add a command purely in `config.lua`: badge, color,
   proximity radius, job whitelist, admin-only, per-command cooldown, delivery targeting
 - **Command-only chat** — plain (non-command) chat is disabled; players get a hint to use `/ooc`, `/twt`, …
-- **Moderation** — profanity filter, anti-spam (cooldown + repeat detection), Discord
-  webhook logging, admin exemptions
+- **Moderation** — profanity filter, anti-spam (cooldown + repeat detection), staff chat
+  mute (`/mutechat`), Discord webhook logging, admin exemptions
 - **Autocomplete suggestions** — command list with help text while typing, Tab to complete,
   arrow keys to navigate, sent-message history with ↑/↓
 - **Typing indicator** — players within 8m see "<name> is typing…"
@@ -57,6 +57,8 @@ Built from scratch (no escrow, no encrypted files) to replace `jc_chat`.
 | `/adminchat` | STAFF | admins only | admin groups |
 | `/clear` | — | clear own chat | — |
 | `/clearall` | — | clear everyone's chat | admin groups |
+| `/mutechat <id> [minutes]` | — | mute a player from chat | admin groups |
+| `/unmutechat <id>` | — | lift a chat mute | admin groups |
 
 > `/me` is intentionally not included — `rc_me` already provides it as 3D bubbles.
 > If you don't run `rc_me`, add a `me` entry to `Config.Commands`.
@@ -146,6 +148,7 @@ TriggerClientEvent('chat:addMessage', playerId, {
 | `Config.FadeTimeout` | ms before the feed fades out |
 | `Config.AntiSpam` | cooldown, repeat detection, webhook |
 | `Config.Profanity` | blocked word list, webhook |
+| `Config.Mute` | mute/unmute command names, default duration, webhook |
 | `Config.TypingIndicator` | enable + distance |
 | `Config.Commands` | the command table (see above) |
 
