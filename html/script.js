@@ -33,6 +33,7 @@ let historyIndex = -1;
 let historyDraft = '';
 let activeSuggestion = -1;
 let visibleSuggestions = [];
+let paramsHintOnly = false;    // suggestions box is just the <params> hint of a typed command
 let fadeTimer = null;
 let typingDebounce = null;
 let typingPlayers = {};        // id -> { name, timeout }
@@ -323,12 +324,16 @@ function updateSuggestions() {
         const matched = suggestions.find((s) => value.startsWith(s.name + ' '));
         if (matched && matched.params && matched.params.length) {
             visibleSuggestions = [matched];
+            activeSuggestion = -1;
+            paramsHintOnly = true;
             renderSuggestions(true);
         } else {
             hideSuggestions();
         }
         return;
     }
+
+    paramsHintOnly = false;
 
     const query = value.toLowerCase();
     visibleSuggestions = suggestions
@@ -386,6 +391,7 @@ function renderSuggestions(paramsOnly) {
 function hideSuggestions() {
     visibleSuggestions = [];
     activeSuggestion = -1;
+    paramsHintOnly = false;
     elSuggestions.classList.add('hidden');
 }
 
@@ -479,7 +485,12 @@ function bindInput() {
         switch (e.key) {
             case 'Enter':
                 e.preventDefault();
-                sendCurrentMessage();
+                // complete the highlighted suggestion instead of sending
+                if (!paramsHintOnly && visibleSuggestions.length > 0 && activeSuggestion >= 0) {
+                    completeSuggestion();
+                } else {
+                    sendCurrentMessage();
+                }
                 break;
 
             case 'Escape':
@@ -489,14 +500,14 @@ function bindInput() {
 
             case 'Tab':
                 e.preventDefault();
-                if (visibleSuggestions.length > 0) {
+                if (!paramsHintOnly && visibleSuggestions.length > 0) {
                     completeSuggestion();
                 }
                 break;
 
             case 'ArrowUp':
                 e.preventDefault();
-                if (visibleSuggestions.length > 0) {
+                if (!paramsHintOnly && visibleSuggestions.length > 0) {
                     activeSuggestion = activeSuggestion <= 0 ? visibleSuggestions.length - 1 : activeSuggestion - 1;
                     renderSuggestions(false);
                 } else if (sentHistory.length > 0) {
@@ -508,7 +519,7 @@ function bindInput() {
 
             case 'ArrowDown':
                 e.preventDefault();
-                if (visibleSuggestions.length > 0) {
+                if (!paramsHintOnly && visibleSuggestions.length > 0) {
                     activeSuggestion = activeSuggestion >= visibleSuggestions.length - 1 ? 0 : activeSuggestion + 1;
                     renderSuggestions(false);
                 } else if (historyIndex >= 0) {
