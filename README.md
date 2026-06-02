@@ -56,7 +56,7 @@ Built from scratch (no escrow, no encrypted files) to replace `jc_chat`.
 | `/ems` | EMS | everyone | `ambulance` job |
 | `/mechanic` | MECHANIC | everyone | `mechanic` job |
 | `/911` | 911 | police only + street + map blip | 30 s cooldown |
-| `/912` | EMS CALL | ambulance only + street + map blip | 30 s cooldown |
+| `/912` | 912 | ambulance only + street + map blip | 30 s cooldown |
 | `/adminchat` | STAFF | admins only | admin groups |
 | `/clear` | — | clear own chat | — |
 | `/clearall` | — | clear everyone's chat | admin groups |
