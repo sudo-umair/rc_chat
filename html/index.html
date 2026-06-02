@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>rc_chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+
+        <!-- Message feed -->
+        <div id="chat-window">
+            <div id="messages"></div>
+            <div id="typing-indicators"></div>
+        </div>
+
+        <!-- Input -->
+        <div id="input-panel" class="hidden">
+            <div class="input-row">
+                <span class="input-prefix">›</span>
+                <input id="chat-input" type="text" autocomplete="off" spellcheck="false" maxlength="256">
+                <button id="settings-button" class="icon-button" title="Chat settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </button>
+                <button id="send-button" class="icon-button" title="Send">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <div id="suggestions" class="hidden"></div>
+        </div>
+
+        <!-- Settings panel -->
+        <div id="settings-panel" class="hidden">
+            <div class="settings-header">
+                <h3>Chat Settings</h3>
+            </div>
+            <div class="settings-body">
+                <div class="setting-group">
+                    <label>Position</label>
+                    <div class="control-row">
+                        <span class="control-label">Offset X</span>
+                        <input id="setting-offset-x" type="range" min="-10" max="60" step="1" value="0">
+                        <span class="control-value" id="setting-offset-x-value">0</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Offset Y</span>
+                        <input id="setting-offset-y" type="range" min="-2" max="60" step="1" value="0">
+                        <span class="control-value" id="setting-offset-y-value">0</span>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label>Font</label>
+                    <div class="control-row">
+                        <span class="control-label">Size</span>
+                        <input id="setting-font-size" type="range" min="70" max="150" step="5" value="100">
+                        <span class="control-value" id="setting-font-size-value">100%</span>
+                    </div>
+                    <div class="control-row">
+                        <span class="control-label">Weight</span>
+                        <select id="setting-font-weight">
+                            <option value="200">Extra Light</option>
+                            <option value="300" selected>Light</option>
+                            <option value="400">Normal</option>
+                            <option value="500">Medium</option>
+                            <option value="600">Semi Bold</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="settings-actions">
+                    <button id="settings-reset" class="panel-button">Reset</button>
+                    <button id="settings-save" class="panel-button primary">Save</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
