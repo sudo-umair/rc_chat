@@ -50,7 +50,7 @@ Built from scratch (no escrow, no encrypted files) to replace `jc_chat`.
 | `/oocl` | OOC LOCAL | 15 m proximity | — |
 | `/do` | DO | 15 m proximity | — |
 | `/twt` | TWEET | everyone | — |
-| `/anon` | ANON TWEET (no name) | everyone | — |
+| `/anon` | ANON (no name) | everyone | — |
 | `/rpol` | POLICE RADIO | police only | `police` job |
 | `/police` | POLICE | everyone | `police` job |
 | `/ems` | EMS | everyone | `ambulance` job |
